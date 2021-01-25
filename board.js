@@ -1,6 +1,7 @@
 class Board{
     constructor() {
         this.squares = new Array(9).fill(null);
+        this.gameStarted = false;
         this.gameEnd = false;
         this.turn = '❤️';
         this.winner = null;
@@ -16,6 +17,7 @@ class Board{
 
     storeMove = (index, piece) => {
         if(!this.squares[index] && piece === this.turn){
+            this.gameStarted = true;
             const newSquares = [...this.squares];
             newSquares.splice(index, 1, piece);
             this.squares = newSquares;
@@ -45,10 +47,12 @@ class Board{
             if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
                 this.gameEnd = true;
                 console.log('found a winner: ', squares[a]);
+                this.winner = squares[a];
                 return squares[a];
             }
         }
         console.log('Noone won.')
+        this.gameStarted = true;
         return null;
     }
 
