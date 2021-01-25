@@ -46,7 +46,7 @@ class Board{
             const [a, b, c] = lines[i];
             if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
                 this.gameEnd = true;
-                console.log('found a winner: ', squares[a]);
+                console.log('Found a winner: ', squares[a]);
                 this.winner = squares[a];
                 return squares[a];
             }
