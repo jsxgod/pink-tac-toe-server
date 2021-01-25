@@ -21,7 +21,7 @@ const joinRoom = ({id, room, name}) => {
         return existingRoom;
     } else {
         player.piece = '❤️';
-        rooms.set(room, {board: new Board(), players: [player], name: room});
+        rooms.set(room, {board: new Board(), players: [player], name: room, rematchRequests: 0});
         return rooms.get(room);
     }
 }

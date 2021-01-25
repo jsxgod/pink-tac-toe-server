@@ -47,11 +47,11 @@ io.on('connection', socket => {
         } else if (numOfPlayers === 2){
             // User connected to a fresh room as the second user - start a new game
             if(!currentRoom.board.gameStarted){
-                console.log('new game')
+                console.log('new game');
                 socket.emit('newGame', {boardState: currentRoom.board.squares, piece: '🎀', turn: false, message: 'Opponent\'s turn: ❤️', opponent: currentRoom.players[0].name});
                 socket.broadcast.to(room).emit('newGame', {boardState: currentRoom.board.squares, piece: '❤️', turn: true, message: "Your turn: ❤️", opponent: name});
-            } else { // Game has been started but is no finished yet
-                console.log('reloading')
+            } else { // Game has been started but is not finished yet
+                console.log('reloading');
                 socket.emit('reload', {piece: determinePiece(currentRoom), boardState: currentRoom.board.squares, nextPiece: currentRoom.board.turn, winner: currentRoom.board.winner});
             }
         } else {
@@ -66,7 +66,8 @@ io.on('connection', socket => {
     socket.on('move', ({index, piece}) => {
         if (currentRoom.board.storeMove(index, piece)){
             if(currentRoom.board.calculateWinner(currentRoom.board.squares)){
-                io.to(currentRoom.name).emit('winner', {boardState: currentRoom.board.squares, winner: currentRoom.board.turn});
+                console.log(currentRoom);
+                io.to(currentRoom.name).emit('winner', {boardState: currentRoom.board.squares, winner: currentRoom.players.filter(player => player.piece === currentRoom.board.winner)[0].id});
             } else if(currentRoom.board.calculateDraw()){
                 io.to(currentRoom.name).emit('draw', {boardState: currentRoom.board.squares});
             } else {
@@ -75,6 +76,18 @@ io.on('connection', socket => {
             }
         } else {
             console.log('Did not store move, board:', currentRoom.board);
+        }
+    });
+
+    socket.on('rematch', () => {
+        currentRoom.rematchRequests += 1;
+
+        if(currentRoom.rematchRequests == 1){
+            socket.broadcast.to(currentRoom.name).emit('request-rematch');
+        } else if (currentRoom.rematchRequests == 2) {
+            currentRoom.rematchRequests = 0;
+            currentRoom.board.squares.fill(null);
+            io.to(currentRoom.name).emit('update', {boardState: currentRoom.board.squares, nextPiece: '❤️'});
         }
     });
 
