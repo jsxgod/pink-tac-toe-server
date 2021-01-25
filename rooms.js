@@ -1,4 +1,6 @@
 
+const Board = require('./board');
+
 rooms = new Map();
 
 const joinRoom = ({id, room, name}) => {
@@ -6,10 +8,20 @@ const joinRoom = ({id, room, name}) => {
     player = {id, name, room};
 
     if(existingRoom){
+        if(existingRoom.players.length === 0){
+            player.piece = '❤️';
+            existingRoom.board = new Board();
+        } else {
+            if(existingRoom.board.gameEnd){
+                existingRoom.board = new Board();
+            }  
+            player.piece = existingRoom.players[0].piece === '❤️' ? '🎀' : '❤️';
+        }
         existingRoom.players.push(player);
         return existingRoom;
     } else {
-        rooms.set(room, {players: [player], name: room});
+        player.piece = '❤️';
+        rooms.set(room, {board: new Board(), players: [player], name: room});
         return rooms.get(room);
     }
 }
